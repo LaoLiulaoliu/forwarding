@@ -15,7 +15,7 @@ def log(msg):
 
 class PipeThread(threading.Thread):
     def __init__(self, source, target):
-        super(Pipe, self).__init__()
+        super(PipeThread, self).__init__()
         self.source = source
         self.target = target
 
