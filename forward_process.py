@@ -61,10 +61,14 @@ class Forwarding(object):
             # TypeError: a class that defines __slots__ without defining __getstate__ cannot be pickled
             result.append( pool.apply_async(pipe, ((self.targethost, self.targetport), cPickle.dumps(client_fd, -1))) )
             result.append( pool.apply_async(pipe, (cPickle.dumps(client_fd, -1), (self.targethost, self.targetport))) )
+
+            #如果我们对返回结果不感兴趣， 那么可以在主进程中使用pool.close与pool.join来防止主进程退出。注意join方法一定要在close或terminate之后调用
             pool.close()
             pool.join()
-#            for res in result:
-#                print res.get()
+            # 主进程运行过程中不等待apply_async的返回结果，主进程结束后，即使子进程还未返回整个程序也会就退出。
+            # 虽然apply_async是非阻塞的，但其返回结果的get方法却是阻塞的，result.get()会阻塞主进程
+            for res in result:
+                print res.get()
 
 
 if __name__ == '__main__':
